@@ -1,46 +1,36 @@
-// Suppose we have a class that interacts with an external service
-
-public class DataService {
-    private ExternalService service;
-
-    public DataService(ExternalService service) {
-        this.service = service;
-    }
-
-    public int processData(int input) {
-        // Logic to process data using the external service
-        return service.performOperation(input);
-    }
-}
-
-// Interface for the external service
-public interface ExternalService {
-    int performOperation(int input);
-}
-
-// Test class using Mockito for mocking ExternalService
 import static org.mockito.Mockito.*;
+import org.junit.Test;
 
-public class DataServiceTest {
+public class CoffeeMakerTest {
+
+    // Mocking the RecipeBook interface
+    RecipeBook recipeBook = mock(RecipeBook.class);
 
     @Test
-    public void testProcessData() {
-        // Create a mock for ExternalService
-        ExternalService mockService = mock(ExternalService.class);
-        
-        // Define stub behavior for the mock
-        when(mockService.performOperation(5)).thenReturn(10);
-        
-        // Create DataService instance with the mock
-        DataService dataService = new DataService(mockService);
-        
-        // Invoke the method under test
-        int result = dataService.processData(5);
-        
-        // Verify the result
-        assertEquals(10, result);
-        
-        // Verify interaction with mock (optional)
-        verify(mockService).performOperation(5);
+    public void testPurchaseBeverage_SufficientIngredients() {
+        // Stubbing RecipeBook methods
+        Recipe selectedRecipe = new Recipe("Latte", 2, 1, 1, 2.50); // Example recipe
+        when(recipeBook.getRecipe(1)).thenReturn(selectedRecipe); // Assuming recipe id 1 is selected
+
+        // Assuming a CoffeeMaker instance that uses RecipeBook
+        CoffeeMaker coffeeMaker = new CoffeeMaker(recipeBook);
+
+        // Simulating the purchase flow
+        coffeeMaker.selectRecipe(1); // User selects recipe with id 1
+        coffeeMaker.depositMoney(3.00); // User deposits enough money
+
+        coffeeMaker.purchaseBeverage();
+
+        // Verify interactions with RecipeBook for the selected recipe
+        verify(recipeBook).getRecipe(1); // Verify getRecipe(1) is called once
+        verify(recipeBook, times(0)).getRecipe(anyInt()); // Verify getRecipe called zero times for other recipes
+
+        // Optionally verify other interactions like checking ingredient amounts
+        verify(recipeBook).getAmtChocolate(); // Verify getAmtChocolate() is called once
+        verify(recipeBook).getAmtCoffee(); // Verify getAmtCoffee() is called once
+        verify(recipeBook).getAmtMilk(); // Verify getAmtMilk() is called once
+        verify(recipeBook).getPrice(); // Verify getPrice() is called once
     }
+
+    // Additional test cases can be added for insufficient ingredients, incorrect recipe id, etc.
 }
