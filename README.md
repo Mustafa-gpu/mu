@@ -1,43 +1,95 @@
-Running hellocucumber.RunCucumberTest
+Feature: Eating cucumbers
 
-Scenario: Sunday isn't Friday        # hellocucumber/is_it_friday_yet.feature:4
-  Given today is Sunday
-  When I ask whether it's Friday yet
-  Then I should be told "Nope"
-┌───────────────────────────────────────────────────────────────────────────────────┐
-│ Share your Cucumber Report with your team at https://reports.cucumber.io          │
-│ Activate publishing with one of the following:                                    │
-│                                                                                   │
-│ src/test/resources/cucumber.properties:          cucumber.publish.enabled=true    │
-│ src/test/resources/junit-platform.properties:    cucumber.publish.enabled=true    │
-│ Environment variable:                            CUCUMBER_PUBLISH_ENABLED=true    │
-│ JUnit:                                           @CucumberOptions(publish = true) │
-│                                                                                   │
-│ More information at https://cucumber.io/docs/cucumber/environment-variables/      │
-│                                                                                   │
-│ Disable this message with one of the following:                                   │
-│                                                                                   │
-│ src/test/resources/cucumber.properties:          cucumber.publish.quiet=true      │
-│ src/test/resources/junit-platform.properties:    cucumber.publish.quiet=true      │
-└───────────────────────────────────────────────────────────────────────────────────┘
-[ERROR] Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.15 s <<< FAILURE! - in hellocucumber.RunCucumberTest
-[ERROR] Is it Friday yet?.Sunday isn't Friday  Time elapsed: 0.062 s  <<< ERROR!
-io.cucumber.junit.platform.engine.UndefinedStepException: 
-The step 'today is Sunday' and 2 other step(s) are undefined.
-You can implement these steps using the snippet(s) below:
+  Scenario: Eating a few cucumbers
+    Given there are 12 cucumbers
+    When I eat 5 cucumbers
+    Then I should have 7 cucumbers left
 
-@Given("today is Sunday")
-public void today_is_sunday() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+  Scenario: Eating too many cucumbers
+    Given there are 5 cucumbers
+    When I eat 6 cucumbers
+    Then I should have 0 cucumbers left
+    And I should see an error message "You can't eat more cucumbers than you have!"
+
+  Scenario: Eating cucumbers with different phrases
+    Given the cucumber count is "12"
+    When I consume "5" cucumbers
+    Then the remaining cucumber count should be "7"
+package com.example.steps;
+
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
+import io.cucumber.java.en.Then;
+import static org.junit.Assert.*;
+
+public class Stepdefs {
+    private int cucumbers;
+    private String errorMessage;
+
+    @Given("there are {int} cucumbers")
+    public void there_are_cucumbers(int initialCount) {
+        cucumbers = initialCount;
+        errorMessage = null;
+    }
+
+    @When("I eat {int} cucumbers")
+    public void i_eat_cucumbers(int count) {
+        if (count > cucumbers) {
+            errorMessage = "You can't eat more cucumbers than you have!";
+            cucumbers = 0;
+        } else {
+            cucumbers -= count;
+        }
+    }
+
+    @Then("I should have {int} cucumbers left")
+    public void i_should_have_cucumbers_left(int expectedCount) {
+        assertEquals(expectedCount, cucumbers);
+    }
+
+    @Then("I should see an error message {string}")
+    public void i_should_see_an_error_message(String expectedMessage) {
+        assertEquals(expectedMessage, errorMessage);
+    }
+
+    // New steps with different phrases using regex in Cucumber expressions
+    @Given("^the cucumber count is \"(\\d+)\"$")
+    public void the_cucumber_count_is(String initialCount) {
+        cucumbers = Integer.parseInt(initialCount);
+        errorMessage = null;
+    }
+
+    @When("^I consume \"(\\d+)\" cucumbers$")
+    public void i_consume_cucumbers(String count) {
+        int numCucumbers = Integer.parseInt(count);
+        if (numCucumbers > cucumbers) {
+            errorMessage = "You can't eat more cucumbers than you have!";
+            cucumbers = 0;
+        } else {
+            cucumbers -= numCucumbers;
+        }
+    }
+
+    @Then("^the remaining cucumber count should be \"(\\d+)\"$")
+    public void the_remaining_cucumber_count_should_be(String expectedCount) {
+        int expectedCucumbers = Integer.parseInt(expectedCount);
+        assertEquals(expectedCucumbers, cucumbers);
+    }
 }
-@When("I ask whether it's Friday yet")
-public void i_ask_whether_it_s_friday_yet() {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+plugins {
+    id 'java'
 }
-@Then("I should be told {string}")
-public void i_should_be_told(String string) {
-    // Write code here that turns the phrase above into concrete actions
-    throw new io.cucumber.java.PendingException();
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'io.cucumber:cucumber-java:7.0.0'
+    testImplementation 'io.cucumber:cucumber-junit:7.0.0'
+    testImplementation 'junit:junit:4.13.2'
+}
+
+test {
+    useJUnitPlatform()
 }
