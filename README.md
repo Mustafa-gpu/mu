@@ -1,68 +1,63 @@
-my-cucumber-project/
-|-- build.gradle
-|-- src/
-|   |-- test/
-|       |-- java/
-|       |   |-- com/
-|       |       |-- example/
-|       |           |-- steps/
-|       |               |-- EatingCucumbersSteps.java
-|       |-- resources/
-|           |-- features/
-|               |-- eating_cucumbers.feature
-plugins {
-    id 'java'
-}
+John Doe: john.doe@example.com, +1-800-555-5555, 12/15/2020
+Jane Smith: jane.smith@website.org, (123) 456-7890, 2021-04-01
+Foo Bar: foo.bar@foo.com, 987.654.3210, 15-05-2019
+Emails found:
+- john.doe@example.com
+- jane.smith@website.org
+- foo.bar@foo.com
 
-repositories {
-    mavenCentral()
-}
+Phone numbers found:
+- +1-800-555-5555
+- (123) 456-7890
+- 987.654.3210
 
-dependencies {
-    testImplementation 'io.cucumber:cucumber-java:7.0.0'
-    testImplementation 'io.cucumber:cucumber-junit:7.0.0'
-    testImplementation 'junit:junit:4.13.2'
-}
+Dates found:
+- 12/15/2020
+- 2021-04-01
+- 15-05-2019
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-test {
-    useJUnitPlatform()
-}
-package com.example.steps;
+public class RegexExample {
 
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.When;
-import io.cucumber.java.en.Then;
-import static org.junit.Assert.*;
+    public static void main(String[] args) {
+        String filePath = "input.txt"; // Path to the input file
+        StringBuilder content = new StringBuilder();
 
-public class EatingCucumbersSteps {
-    private int cucumbers;
-    private String errorMessage;
-
-    @Given("there are {int} cucumbers")
-    public void there_are_cucumbers(int initialCount) {
-        cucumbers = initialCount;
-        errorMessage = null;
-    }
-
-    @When("I eat {int} cucumbers")
-    public void i_eat_cucumbers(int count) {
-        if (count > cucumbers) {
-            errorMessage = "You can't eat more cucumbers than you have!";
-            cucumbers = 0;
-        } else {
-            cucumbers -= count;
+        // Read the file content
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                content.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+        String text = content.toString();
+
+        // Regular expressions for email, phone numbers, and dates
+        String emailRegex = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}";
+        String phoneRegex = "\\+?[0-9.()\\-\\s]+";
+        String dateRegex = "(\\d{2}/\\d{2}/\\d{4})|(\\d{4}-\\d{2}-\\d{2})|(\\d{2}-\\d{2}-\\d{4})";
+
+        // Find and print all matches
+        findAndPrintMatches("Emails found:", text, emailRegex);
+        findAndPrintMatches("Phone numbers found:", text, phoneRegex);
+        findAndPrintMatches("Dates found:", text, dateRegex);
     }
 
-    @Then("I should have {int} cucumbers left")
-    public void i_should_have_cucumbers_left(int expectedCount) {
-        assertEquals(expectedCount, cucumbers);
-    }
+    private static void findAndPrintMatches(String header, String text, String regex) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(text);
 
-    @Then("I should see an error message {string}")
-    public void i_should_see_an_error_message(String expectedMessage) {
-        assertEquals(expectedMessage, errorMessage);
+        System.out.println(header);
+        while (matcher.find()) {
+            System.out.println("- " + matcher.group());
+        }
+        System.out.println();
     }
 }
-gradle build
-gradle test
