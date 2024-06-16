@@ -1,67 +1,66 @@
-public interface RecipeBook {
-    Recipe getRecipe(int recipeId);
-    int getAmtChocolate();
-    int getAmtCoffee();
-    int getAmtMilk();
-    double getPrice();
+plugins {
+    id 'java'
 }
-public class CoffeeMaker {
-    private RecipeBook recipeBook;
 
-    public CoffeeMaker(RecipeBook recipeBook) {
-        this.recipeBook = recipeBook;
-    }
-
-    public void selectRecipe(int recipeId) {
-        // Logic to select a recipe
-    }
-
-    public void depositMoney(double amount) {
-        // Logic to handle money deposit
-    }
-
-    public void purchaseBeverage() {
-        // Logic to purchase beverage
-        int chocolate = recipeBook.getAmtChocolate();
-        int coffee = recipeBook.getAmtCoffee();
-        int milk = recipeBook.getAmtMilk();
-        double price = recipeBook.getPrice();
-
-        // Additional logic to check ingredients, money, dispense beverage, return change
-    }
+repositories {
+    mavenCentral()
 }
-import static org.mockito.Mockito.*;
-import org.junit.Test;
 
-public class CoffeeMakerTest {
+dependencies {
+    testImplementation 'io.cucumber:cucumber-java:7.0.0'
+    testImplementation 'io.cucumber:cucumber-junit:7.0.0'
+    testImplementation 'junit:junit:4.13.2'
+}
 
-    // Mocking the RecipeBook interface
-    RecipeBook recipeBook = mock(RecipeBook.class);
+test {
+    useJUnitPlatform()
+}
+Feature: Eating cucumbers
 
-    @Test
-    public void testPurchaseBeverage_SufficientIngredientsAndMoney() {
-        // Stubbing RecipeBook methods
-        Recipe selectedRecipe = new Recipe("Latte", 2, 1, 1, 2.50); // Example recipe
-        when(recipeBook.getRecipe(1)).thenReturn(selectedRecipe); // Assuming recipe id 1 is selected
+  Scenario: Eating a few cucumbers
+    Given there are 12 cucumbers
+    When I eat 5 cucumbers
+    Then I should have 7 cucumbers left
 
-        // Assuming a CoffeeMaker instance that uses RecipeBook
-        CoffeeMaker coffeeMaker = new CoffeeMaker(recipeBook);
+  Scenario: Eating too many cucumbers
+    Given there are 5 cucumbers
+    When I eat 6 cucumbers
+    Then I should have 0 cucumbers left
+    And I should see an error message "You can't eat more cucumbers than you have!"
+package com.example.steps;
 
-        // Simulating the purchase flow
-        coffeeMaker.selectRecipe(1); // User selects recipe with id 1
-        coffeeMaker.depositMoney(3.00); // User deposits enough money
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.When;
+import io.cucumber.java.en.Then;
+import static org.junit.Assert.*;
 
-        coffeeMaker.purchaseBeverage();
+public class EatingCucumbersSteps {
+    private int cucumbers;
+    private String errorMessage;
 
-        // Verify interactions with RecipeBook for the selected recipe
-        verify(recipeBook).getRecipe(1); // Verify getRecipe(1) is called once
-        verify(recipeBook, times(0)).getRecipe(anyInt()); // Verify getRecipe called zero times for other recipes
-
-        verify(recipeBook).getAmtChocolate(); // Verify getAmtChocolate() is called once
-        verify(recipeBook).getAmtCoffee(); // Verify getAmtCoffee() is called once
-        verify(recipeBook).getAmtMilk(); // Verify getAmtMilk() is called once
-        verify(recipeBook).getPrice(); // Verify getPrice() is called once
+    @Given("there are {int} cucumbers")
+    public void there_are_cucumbers(int initialCount) {
+        cucumbers = initialCount;
+        errorMessage = null;
     }
 
-    // Additional test cases can be added for insufficient ingredients, incorrect recipe id, etc.
+    @When("I eat {int} cucumbers")
+    public void i_eat_cucumbers(int count) {
+        if (count > cucumbers) {
+            errorMessage = "You can't eat more cucumbers than you have!";
+            cucumbers = 0;
+        } else {
+            cucumbers -= count;
+        }
+    }
+
+    @Then("I should have {int} cucumbers left")
+    public void i_should_have_cucumbers_left(int expectedCount) {
+        assertEquals(expectedCount, cucumbers);
+    }
+
+    @Then("I should see an error message {string}")
+    public void i_should_see_an_error_message(String expectedMessage) {
+        assertEquals(expectedMessage, errorMessage);
+    }
 }
