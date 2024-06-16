@@ -1,118 +1,48 @@
+Feature: Login Feature
+
+  Scenario: Successful login with valid credentials
+    Given I am on the login page
+    When I enter username "user1" and password "password123"
+    And I click on the login button
+    Then I should be logged into the system
+import cucumber.api.java.en.Given;
+import cucumber.api.java.en.When;
+import cucumber.api.java.en.Then;
+
 public class Stepdefs {
-// NOTE: because the regular expressions are within 
-   // Java strings, we have to make all backslashes double backslashes
-   // for them to work correctly.  So, to find a decimal character,
-   // rather than writing \d, you must write \\d. 
 
-   // NOTE 2: to explicitly force a pattern to start with the 
-   // beginning of the input string, start with ^.  To force it to 
-   // end at the end of the input string, use $.  For example:
-   // @When("test_foo \\d") will match:
-   //     test_foo 5
-   // but will also match:
-   //     some test_foo 5 dollars
-   //     bugga bugga test_foo 1 yeeeeeehaaaaaaaaw
-   // 
-   // On the other hand:
-   // @When("^test_foo \\d$")
-   // will only match: test_foo 5
-   // 
+    @Given("^the user is on the login page$")
+    public void navigateToLoginPage() {
+        System.out.println("Navigating to the login page");
+        // Add actual navigation code here if necessary
+    }
 
-   // NOTE 3: to not 'capture' a pattern as an argument to the 
-   // Java method, use (?:<pattern>)
-   // For example: 
-   //    @When("^match_four ((in|out)(foo|bar))$") 
-   // will match the words:
-   //   infoo, inbar, outfoo, and outbar.  
-   // However, the associated Java function will require three 
-   // parameters: one for the 'in/out' value, one for the 
-   // 'foo/bar' value, and one for their concatenation.  To 
-   // only capture the concatenated value, use: 
-   //   @When("^match_four ((?:in|out)(?:foo|bar))$")
-   // 
-   // You will probably need this to do the IP address example :)
+    @When("^they enter \"([^\"]*)\" and \"([^\"]*)\"$")
+    public void enterCredentials(String username, String password) {
+        System.out.println("Entering credentials: " + username + " / " + password);
+        // Add actual credential entering code here if necessary
+    }
 
-
-   // Regular expression matcher for positive integers
-   // Should match the string: test_posint followed by an sequence of 
-   // digits of arbitrary length 
-@When("^test_posint (?:\\d+)$")
-public void test_posint(int number) throws Throwable {
-        System.out.println("test_posint true for: " + number);
+    @Then("^they should be logged in$")
+    public void verifyLoggedIn() {
+        System.out.println("Verifying user is logged in");
+        // Add verification code here
+    }
 }
+Explanation:
+Given Step: @Given("^the user is on the login page$")
 
-// Regular expression matcher for integers
-   // Should match the string: test_int followed by an optional
-    // minus sign followed by a sequence of 
-   // digits of arbitrary length 
-    //
-    // I give you this one as a freebie!
-@When("^test_int -?(?:\\d+)$")
-public void test_int(int arg1) throws Throwable {
-        System.out.println("test_int true for: " + arg1);
-}
+This method (navigateToLoginPage) will be called when the step "Given the user is on the login page" is matched. You can implement navigation logic or setup necessary conditions for the test here.
+When Step: @When("^they enter \"([^\"]*)\" and \"([^\"]*)\"$")
 
-// Regular expression matcher for floats
-   // Should match the string: test_float followed by an optional
-    // minus sign followed by a sequence of 
-   // digits of arbitrary length followed by a period followed by
-    // a second sequence of digits of arbitrary length.
-@When("^test_float -?(?:\\d+\\.+\\d+$)")
-public void test_float(float arg1) throws Throwable {
-        System.out.println("test_int true for: " + arg1);
-}
+This method (enterCredentials) will be called when the step "When they enter "username" and "password"" is matched. It uses regex with capture groups ("([^\"]*)"), allowing you to capture the username and password for use in the method.
+Then Step: @Then("^they should be logged in$")
 
-// Regular expression matcher for IP addresses (though inexact).
-    // It should accept four digit sequences separated by periods
-    // where a digit sequence is defined as follows:
-    //    Any single digit
-    //    Any two digit characters if the first character is non-zero
-    //    A one followed by a zero, one, or two followed by any digit
-
-    // SEE NOTE 3 :)
-@When("^test_ip_address ((?:(?:(?:\\d)|(?:1[0-2]\\d)|(?:[1-9]\\d))\\.){3}(?:(?:\\d)|(?:[1-9]\\d)|(?:1[0-2]\\d)))$")
-public void test_ip_address(String arg1) throws Throwable {
-        System.out.println("test_ip_address true for: " + arg1);
-}
-
-
-// Pattern distinguisher.  
-    // Should match the string starting with: test_splitter arg
-    // Where <arg> should match the following positive examples
-    // and not the negative examples.  Note: any string not in the 
-    // positive or negative examples can be accepted or rejected.
-    // 
-    // Positive:      Negative:
-    // =========      =========
-    // spill         si
-    // Sponge        egregious
-    // tap          Foul
-    // rebuild       Test
-    //                  top
-    //                  ta
-@When("^test_splitter (?:\\bspill|Sponge|tap|rebuild\\b)((?!si|egregious|Foul|Test|ta|\\w).)*$")
-public void test_splitter(String match) throws Throwable {
-        System.out.println("test_splitter true for: " + match);
-}
-
-
-// Pattern distinguisher 2.  
-    // Should match the string starting with: test_splitter2 arg
-    // Where <arg> should match the following positive examples
-    // and not the negative examples.  Note: any string not in the
-    // positive or negative examples can be accepted or rejected.
-    // 
-    // Positive:      Negative:
-    // =========      =========
-    // spill         spall
-    // Sponge        egregious
-    // tap          foul
-    // rebuild       test
-    //                  top
-    //                  tapper
-@When("^test_splitter2 (?:\\bspill|Sponge|tap|rebuild\\b)((?!spall|egregious|foul|Test|top|tapper|\\w).)*$")
-public void test_splitter2(String match) throws Throwable {
-        System.out.println("test_splitter2 true for: " + match);
-}
-}
-
+This method (verifyLoggedIn) will be called when the step "Then they should be logged in" is matched. Here you can implement assertions or verification logic to check if the user is successfully logged in.
+Running the Scenario
+Ensure your Cucumber setup is correct with dependencies like cucumber-java and cucumber-junit.
+Run the scenario using Gradle (gradlew test) or your IDE's test runner.
+The console output (System.out.println statements) will indicate if each step is being executed as expected.
+Note:
+Replace System.out.println statements with actual implementation logic (like Selenium WebDriver actions or API calls) as per your application's requirements.
+Extend the Stepdefs.java file to cover more scenarios from Test.feature by adding additional methods annotated with @Given, @When, and @Then, each with corresponding regular expressions that match the steps in your scenarios.
