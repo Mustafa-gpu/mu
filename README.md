@@ -1,3 +1,15 @@
+my-cucumber-project/
+|-- build.gradle
+|-- src/
+|   |-- test/
+|       |-- java/
+|       |   |-- com/
+|       |       |-- example/
+|       |           |-- steps/
+|       |               |-- EatingCucumbersSteps.java
+|       |-- resources/
+|           |-- features/
+|               |-- eating_cucumbers.feature
 plugins {
     id 'java'
 }
@@ -15,18 +27,6 @@ dependencies {
 test {
     useJUnitPlatform()
 }
-Feature: Eating cucumbers
-
-  Scenario: Eating a few cucumbers
-    Given there are 12 cucumbers
-    When I eat 5 cucumbers
-    Then I should have 7 cucumbers left
-
-  Scenario: Eating too many cucumbers
-    Given there are 5 cucumbers
-    When I eat 6 cucumbers
-    Then I should have 0 cucumbers left
-    And I should see an error message "You can't eat more cucumbers than you have!"
 package com.example.steps;
 
 import io.cucumber.java.en.Given;
@@ -64,3 +64,5 @@ public class EatingCucumbersSteps {
         assertEquals(expectedMessage, errorMessage);
     }
 }
+gradle build
+gradle test
